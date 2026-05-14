@@ -1,0 +1,14 @@
+Using dataset: /home/lht/dev/study/ai/lab3/SMSSpamCollection
+
+=== Evaluation on test set ===
+Accuracy: 1.0
+
+Confusion Matrix (rows=true, cols=pred) labels=
+ ['ham', 'spam']
+[2, 0]
+[0, 1]
+
+Classification Report:
+label	precision	recall	f1	support
+ham	1.000	1.000	1.000	2
+spam	1.000	1.000	1.000	1
