@@ -10,7 +10,7 @@ date: "2026/06/04"
 
 # 实验题目
 
-利用 MLP 在 Ames Housing 数据集上完成购房预测训练（回归任务）。使用 PyTorch 实现 MLP 网络，MSE 损失函数，随机初始化网络参数。
+利用 MLP 在 Ames Housing 数据集上完成购房预测训练（回归任务）。使用 PyTorch 实现 MLP 网络。
 
 # 实验内容
 
@@ -31,7 +31,6 @@ $$
 
 其中 $\mathbf{W}^{(l)}$ 和 $\mathbf{b}^{(l)}$ 为第 $l$ 层的权重和偏置，$\sigma$ 为激活函数（本实验使用 ReLU）。
 
-**ReLU 激活函数**：$\text{ReLU}(x) = \max(0, x)$，计算简单且能有效缓解梯度消失问题。
 
 ### 1.2 均方误差损失 (MSE)
 
@@ -59,7 +58,6 @@ Adam 结合了动量法和 RMSProp 的优点，自适应调整学习率，收敛
 ### 1.5 数据预处理
 
 - **缺失值处理**：数值特征用中位数填充，类别特征用 "None" 填充。
-- **类别编码**：使用 Label Encoding 将类别特征转换为整数。
 - **标准化**：使用 StandardScaler 将所有特征缩放到均值为 0、方差为 1。
 - **目标变换**：对 SalePrice 取 $\log(1+x)$ 变换，使其分布更接近正态分布。
 
@@ -157,10 +155,6 @@ for epoch in range(1, EPOCHS + 1):
 
 每层隐藏层后添加 BatchNorm 稳定训练，再通过 Dropout(p=0.2) 随机丢弃神经元，两者配合既加速收敛又有效防止过拟合。
 
-### 3.4 渐进式隐藏层结构
-
-采用 [256, 128, 64, 32] 的递减隐藏层结构，让网络逐步压缩信息，形成"瓶颈"效应，有助于提取更紧凑的特征表示。
-
 # 实验结果及分析
 
 ## 1. 实验结果展示
@@ -186,21 +180,6 @@ for epoch in range(1, EPOCHS + 1):
 | 优化器 | Adam |
 | 总参数量 | 64,705 |
 
-### 1.3 测试集预测结果（前 10 条）
-
-| Id | Predicted SalePrice |
-|----|---------------------|
-| 1461 | 122,819 |
-| 1462 | 144,133 |
-| 1463 | 166,709 |
-| 1464 | 166,174 |
-| 1465 | 159,213 |
-| 1466 | 172,034 |
-| 1467 | 146,111 |
-| 1468 | 156,838 |
-| 1469 | 168,805 |
-| 1470 | 143,285 |
-
 ## 2. 评测指标展示及分析
 
 ### 2.1 训练过程指标
@@ -217,14 +196,11 @@ for epoch in range(1, EPOCHS + 1):
 
 1. **收敛情况**：模型在约 150 个 epoch 后验证损失趋于稳定，354 epoch 时触发 early stopping。训练损失持续下降而验证损失保持稳定，说明模型容量适中，未出现严重过拟合。
 
-2. **Val RMSE (log 空间) = 0.1616**：在 log 空间中 RMSE 为 0.1616，换算回原始价格空间，意味着预测误差约为 $\exp(0.1616) - 1 \approx 17.5\%$ 的相对误差水平。对于房价预测任务，这一误差水平是可以接受的。
+2. **Val RMSE (log 空间) = 0.1616**：在 log 空间中 RMSE 为 0.1616，换算回原始价格空间，意味着预测误差约为 $\exp(0.1616) - 1 \approx 17.5\%$ 的相对误差水平。
 
 3. **预测分布**：测试集预测价格范围在 [52,527, 583,124] 之间，均值约 167,590，与训练集 SalePrice 的分布（均值 180,921，范围 [34,900, 755,000]）基本一致。
 
-4. **泛化能力**：模型在验证集上的表现（RMSE log = 0.16）与训练集（RMSE log = 1.03）的差距主要来自训练阶段仍在优化的样本，以及 Dropout 在训练/推理模式下的差异。
-
 ---
-|----------如有优化，请重复1，2，分析优化后的算法结果----------|
 
 （本次实验已包含上述优化策略：Log 变换、学习率调度、BN+Dropout 组合、渐进式隐藏层。以下为消融实验对比。）
 
@@ -239,7 +215,7 @@ for epoch in range(1, EPOCHS + 1):
 | + Batch Normalization | 0.1987 |
 | + Dropout (0.2) | 0.1853 |
 | + 学习率调度 (ReduceLROnPlateau) | 0.1739 |
-| **完整配置（上述全部 + Early Stopping）** | **0.1616** |
+| **完整配置（+ Early Stopping）** | **0.1616** |
 
 ## 优化后评测指标展示及分析
 
@@ -261,6 +237,4 @@ for epoch in range(1, EPOCHS + 1):
 
 - Ames Housing Dataset: https://www.kaggle.com/competitions/house-prices-advanced-regression-techniques
 - PyTorch Documentation: https://pytorch.org/docs/stable/index.html
-- Ioffe, S. & Szegedy, C. (2015). Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift. ICML 2015.
-- Srivastava, N. et al. (2014). Dropout: A Simple Way to Prevent Neural Networks from Overfitting. JMLR 2014.
-- Kingma, D. P. & Ba, J. (2014). Adam: A Method for Stochastic Optimization. ICLR 2015.
+

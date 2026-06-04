@@ -4,6 +4,7 @@
 *.pptx
 *.doc
 *.docx
+*.tar
 
 .venv/
 
