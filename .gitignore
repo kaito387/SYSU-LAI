@@ -5,6 +5,7 @@
 *.doc
 *.docx
 *.tar
+*.pth
 
 .venv/
 
