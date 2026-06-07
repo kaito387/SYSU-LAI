@@ -71,7 +71,7 @@ DQN 引入了 Experience Replay。即把这局游戏的经验存入缓存区，�
 
 ![Experience Replay](https://huggingface.co/datasets/huggingface-deep-rl-course/course-images/resolve/main/en/unit4/experience-replay.jpg)
 
-### Fixed Q-Target to stabilize the training
+### Fixed Q-Target to stabilize the training (Double DQN)
 
 注意我们如果直接使用当前网络提供的估计值 $Q_\theta(s', a')$ 来我们对更新 $Q_\theta(s, a)$ 的估计，是非常不稳定的。情景有点类似下面这种情况：
 
@@ -79,9 +79,15 @@ DQN 引入了 Experience Replay。即把这局游戏的经验存入缓存区，�
 
 我们的牛仔（Q estimation），尝试通过反向传播更新网络，靠近奶牛（Q target）。但每次反向传播后，奶牛也会因为网络的变化而移动，相当于你在追逐一个移动的靶子。本质上，你不能直接利用证明 Q-Learning 收敛性的方法证明 DQN 也会收敛。所以网络很有可能会震荡，影响训练。
 
-DQN 则引入 $\theta$ 表示训练网络和 $\theta^-$ 表示目标网络，训练时先令 $\theta^-\gets \theta$，之后固定目标网络不动，类似监督学习，而只修改训练网络 $\theta$ 的权值：
+DQN 则引入 $\theta$ 表示训练网络和 $\theta^-$ 表示目标网络，训练时先令 $\theta^-\gets \theta$，之后固定目标网络不动，类似监督学习，而只修改训练网络 $\theta$ 的权值。
+
+所以要分两步，首先根据 $\theta$ 找到最优动作：
 $$
-Q(s, a)_\theta\gets Q_\theta(s, a) + \alpha\left(r + \gamma \max_{a'} Q_{\theta^-}(s', a') - Q_\theta(s, a)\right)
+a^* = {\arg\max}_{a'} Q_{\theta}(s', a')
+$$
+然后再利用 $\theta^-$ 来估计误差 TD（Temporal Difference）：
+$$
+Q(s, a)_\theta\gets Q_\theta(s, a) + \alpha\left(r + \gamma Q_{\theta^-}(s', a^*) - Q_\theta(s, a)\right)
 $$
 
 ---
