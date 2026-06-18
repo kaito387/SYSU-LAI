@@ -9,6 +9,10 @@ fontsize: 12pt
 # 中文字体（关键配置）
 CJKmainfont: "Noto Sans CJK SC"
 
+mainfont: Noto Serif CJK SC
+monofont: DejaVu Sans Mono
+sansfont: Noto Sans CJK SC
+
 # 页边距
 geometry:
   - margin=2.5cm
